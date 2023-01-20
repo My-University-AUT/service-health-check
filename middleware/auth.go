@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/alinowrouzii/service-health-check/controllers"
+	"github.com/alinowrouzii/service-health-check/models"
 	"github.com/alinowrouzii/service-health-check/token"
 )
 
@@ -42,7 +43,22 @@ func TokenMiddleware(next http.HandlerFunc, jwt *token.JWTMaker) http.HandlerFun
 		}
 
 		// fmt.Println("payload inside middleware", payload)
-		rcopy := r.WithContext(context.WithValue(r.Context(), "payload", payload))
+		user := &models.User{
+			Email: payload.Email,
+		}
+		user, err = models.GetUserByEmail(jwt.DB, payload.Email)
+		if err != nil {
+			controllers.RespondWithError(w, http.StatusUnauthorized, "Internal server error")
+			return
+		}
+
+		userResponse := &models.UserResponse{
+			ID:    user.ID,
+			Email: user.Email,
+			Links: user.Links,
+		}
+
+		rcopy := r.WithContext(context.WithValue(r.Context(), "user", userResponse))
 
 		// Call the next handler, which can be another middleware in the chain, or the final handler.
 		next.ServeHTTP(w, rcopy)

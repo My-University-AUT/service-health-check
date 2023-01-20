@@ -6,15 +6,17 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/alinowrouzii/service-health-check/models"
 	"github.com/alinowrouzii/service-health-check/routers"
 	"github.com/alinowrouzii/service-health-check/token"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
+	"gorm.io/gorm"
 )
 
 type App struct {
 	Router *mux.Router
-	DB     *sql.DB
+	DB     *gorm.DB
 	jwt    *token.JWTMaker
 }
 
@@ -40,12 +42,7 @@ func (a *App) dropAndCreateDatabase(connectionString, dbName string) {
 }
 
 func (a *App) connectDB(user, password, dbName string) {
-
-	connectionString := fmt.Sprintf("%s:%s@tcp(127.0.0.1:3306)/", user, password)
-
-	connectionString += dbName + "?parseTime=true"
-
-	dbConn, err := sql.Open("mysql", connectionString)
+	dbConn, err := models.InitModels()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -58,7 +55,6 @@ func (a *App) Initialize(user, password, dbname, secretKey string) {
 	var err error
 	a.jwt, err = token.NewJWTMaker(secretKey, a.DB)
 	if err != nil {
-		log.Fatal("error occured in jwt initialization")
 		log.Fatal(err)
 	}
 
@@ -67,5 +63,6 @@ func (a *App) Initialize(user, password, dbname, secretKey string) {
 }
 
 func (a *App) Run(addr string) {
+	log.Println("starting on", addr)
 	log.Fatal(http.ListenAndServe(addr, a.Router))
 }
