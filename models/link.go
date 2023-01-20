@@ -6,8 +6,8 @@ import (
 
 type Link struct {
 	gorm.Model
-	URL    string `validate:"required"`
-	UserID uint
+	URL    string `json:"url" validate:"required"`
+	UserID uint   `json:"user_id"`
 }
 
 func (link *Link) CreateLink(db *gorm.DB) error {

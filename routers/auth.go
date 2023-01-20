@@ -15,5 +15,4 @@ func InitAuthRouter(r *mux.Router, cfg *controllers.Config) {
 	r.PathPrefix("/auth").Subrouter().HandleFunc("/login", cfg.LoginHandler).Methods("POST")
 	r.PathPrefix("/auth").Subrouter().HandleFunc("/register", cfg.RegisterHandler).Methods("POST")
 	r.PathPrefix("/auth").Subrouter().HandleFunc("/", middleware.TokenMiddleware(http.HandlerFunc(cfg.GetUserHandler), cfg.JWT)).Methods("GET")
-
 }

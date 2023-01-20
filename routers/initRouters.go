@@ -7,12 +7,15 @@ import (
 	"gorm.io/gorm"
 )
 
-func InitRouter(r *mux.Router, db *gorm.DB, jwt *token.JWTMaker) {
+func InitRouter(db *gorm.DB, jwt *token.JWTMaker) *mux.Router {
+	router := mux.NewRouter()
 	cfg := &controllers.Config{
 		DB:  db,
 		JWT: jwt,
 	}
 
-	InitAuthRouter(r, cfg)
-	InitLinkRouter(r, cfg)
+	InitAuthRouter(router, cfg)
+	InitLinkRouter(router, cfg)
+
+	return router
 }
