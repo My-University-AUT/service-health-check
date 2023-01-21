@@ -13,6 +13,8 @@ func InitModels() (*gorm.DB, error) {
 
 	db.AutoMigrate(&User{})
 	db.AutoMigrate(&Link{})
+	db.AutoMigrate(&LinkStatus{})
+	db.AutoMigrate(&Warning{})
 
 	return db, nil
 }
