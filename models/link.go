@@ -46,10 +46,31 @@ func GetLinksStat(db *gorm.DB, userId uint) ([]LinkStat, error) {
 }
 
 func GetLinksStatByLinkID(db *gorm.DB, userId uint, linkID string) ([]LinkStat, error) {
+	temp := &LinkStatus{
+		LinkID:     2,
+		StatusCode: 500,
+	}
+	err := temp.CreateLinkStatus(db)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	temp = &LinkStatus{
+		LinkID:     2,
+		StatusCode: 501,
+	}
+	temp.CreateLinkStatus(db)
+
+	temp = &LinkStatus{
+		LinkID:     2,
+		StatusCode: 200,
+	}
+	temp.CreateLinkStatus(db)
+
 	lastDay := time.Now().Add(-24 * time.Hour)
 	var linkStat []LinkStat
 	query := db.Select("status_code, link_id, url, count(*) as count").Table("links").Where("links.user_id = ? and links.id = ?", userId, linkID).Joins("left join link_statuses on link_statuses.link_id = links.id").Where("link_statuses.created_at > ?", lastDay).Group("status_code, link_id").Find(&linkStat)
 
-	log.Println("result i want to show", query.Error, linkStat)
+	log.Println("result i want to show in GetLinksStatByLinkID", query.Error, linkStat)
 	return linkStat, query.Error
 }

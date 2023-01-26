@@ -16,6 +16,7 @@ func InitRouter(db *gorm.DB, jwt *token.JWTMaker) *mux.Router {
 
 	InitAuthRouter(router, cfg)
 	InitLinkRouter(router, cfg)
+	InitWarningRouter(router, cfg)
 
 	return router
 }
